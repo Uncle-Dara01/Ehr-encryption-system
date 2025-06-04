@@ -1,23 +1,77 @@
-import React from "react";
+import React, { useState } from "react";
 
 const PatientRegistration = () => {
+  const [patients, setPatients] = useState(() => {
+    return JSON.parse(localStorage.getItem("patients")) || [];
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value.trim().toLowerCase();
+    const password = e.target.password.value;
+    const confirm = e.target.confirm.value;
+
+    // Validate input
+    if (!email || !password || !confirm) {
+      alert("All fields are required.");
+      return;
+    }
+
+    if (password !== confirm) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    // Check if email already exists
+    const existing = patients.find((p) => p.email === email);
+    if (existing) {
+      alert("A patient with this email already exists.");
+      return;
+    }
+
+    // Create new patient object
+    const newPatient = {
+      id: Date.now(),
+      email,
+      password,
+    };
+
+    // Update patient list and save to localStorage
+    const updatedList = [...patients, newPatient];
+    localStorage.setItem("patients", JSON.stringify(updatedList));
+    setPatients(updatedList);
+
+    e.target.reset();
+    alert("Patient registered successfully.");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-semibold mb-6 text-blue-800">Patient Registration</h2>
 
-        {/* Personal Details */}
-        <form className="space-y-8">
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          {/* Personal Details */}
           <section>
             <h3 className="text-xl font-medium mb-4 text-gray-700">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-1 text-sm font-medium">First Name</label>
-                <input type="text" placeholder="John" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="John"
+                  className="w-full border px-4 py-2 rounded-md"
+                  required
+                />
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Last Name</label>
-                <input type="text" placeholder="Doe" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="Doe"
+                  className="w-full border px-4 py-2 rounded-md"
+                  required
+                />
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Gender</label>
@@ -33,15 +87,29 @@ const PatientRegistration = () => {
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Phone Number</label>
-                <input type="tel" placeholder="(123) 456-7890" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="tel"
+                  placeholder="(123) 456-7890"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Email</label>
-                <input type="email" placeholder="email@example.com" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="email@example.com"
+                  className="w-full border px-4 py-2 rounded-md"
+                  required
+                />
               </div>
               <div className="md:col-span-2">
                 <label className="block mb-1 text-sm font-medium">Address</label>
-                <input type="text" placeholder="123 Main St, City" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="123 Main St, City"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
             </div>
           </section>
@@ -52,15 +120,27 @@ const PatientRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-1 text-sm font-medium">Name</label>
-                <input type="text" placeholder="Jane Doe" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="Jane Doe"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Relationship</label>
-                <input type="text" placeholder="Spouse" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="Spouse"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
               <div className="md:col-span-2">
                 <label className="block mb-1 text-sm font-medium">Phone Number</label>
-                <input type="tel" placeholder="(123) 456-7899" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="tel"
+                  placeholder="(123) 456-7899"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
             </div>
           </section>
@@ -85,12 +165,40 @@ const PatientRegistration = () => {
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Allergies</label>
-                <input type="text" placeholder="Penicillin, Nuts" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  type="text"
+                  placeholder="Penicillin, Nuts"
+                  className="w-full border px-4 py-2 rounded-md"
+                />
               </div>
               <div className="md:col-span-2">
                 <label className="block mb-1 text-sm font-medium">Current Medications</label>
-                <textarea className="w-full border px-4 py-2 rounded-md" placeholder="List medications..."></textarea>
+                <textarea
+                  className="w-full border px-4 py-2 rounded-md"
+                  placeholder="List medications..."
+                ></textarea>
               </div>
+            </div>
+          </section>
+          <section>
+             <h3 className="text-xl font-medium mb-4 text-gray-700">LOGIN CREDENTIALS</h3>
+            <div className="grid grid-cols-1">
+             <label className="block mb-1 text-sm font-medium">Email</label>
+                <input
+                  type="email"
+                  placeholder="example@gmail.com"
+                  className="w-full border px-4 py-2 rounded-md"/>
+<label className="block mb-1 text-sm font-medium">Password</label>
+                <input
+                  type="password"
+                  placeholder="*******"
+                  className="w-full border px-4 py-2 rounded-md"/>
+<label className="block mb-1 text-sm font-medium">Confirm password</label>
+                <input
+                  type="password"
+                  placeholder="*******"
+                  className="w-full border px-4 py-2 rounded-md"/>
+
             </div>
           </section>
 
