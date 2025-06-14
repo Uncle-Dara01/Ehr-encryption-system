@@ -1,53 +1,70 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
+import axios from "axios";
 
 const PatientSettings = () => {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("Reset Password");
+  const [submitted, setSubmitted] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const navigate = useNavigate();
 
-  // Load image from localStorage on mount
-  useEffect(() => {
-    const storedImage = localStorage.getItem("patientProfileImage");
-    if (storedImage) {
-      setProfileImage(storedImage);
-    }
-  }, []);
+   useEffect(()=>{
+      const checkedAuth = async()=>{
+        try{
+          const token = localStorage.getItem("token");
+  
+          if(!token){
+            return navigate("/patient/login");
+          }else{
+            setChecked(true);
+          }
+         } catch(error){
+          console.error(error);
+          navigate("/patient/login");
+        }
+      };
+  
+      checkedAuth();
+    }, [navigate]);
 
-  const handleResetPassword = (e) => {
+
+  const handleResetPassword = async(e) => {
+    try{
     e.preventDefault();
-    alert("Password reset request submitted.");
-    setOldPassword("");
-    setNewPassword("");
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    const response = await axios.post("http://localhost:4040/patient/reset-password", {
+      oldPassword, newPassword
+    }, {
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    })
+      if (response.status === 200) {
+        setSubmitted(true);
+        setMessage(response.data.message || "Password reset successfully.");
+      } else {
+        setMessage(response.data.message || "Password reset failed.");
+      }
+  }catch(error){
+    console.error(error);
+    setMessage(error?.response?.data?.message || "Login Failed!")
+  }finally{
+    setLoading(false);
+  }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
-      localStorage.setItem("patientProfileImage", imageUrl);
-    }
-  };
+  if(!checked) return <p className="text-center mt-5">Checking Authentication, Please Wait..</p>
 
   return (
     <div className="max-w-lg mx-auto">
       <h2 className="text-2xl font-bold mb-6">Settings</h2>
-
-      {/* Profile Image Upload */}
-      <div className="mb-6">
-        <label className="block font-medium mb-2">Profile Picture</label>
-        {profileImage && (
-          <img
-            src={profileImage}
-            alt="Profile"
-            className="w-28 h-28 rounded-full object-cover mb-2 border"
-          />
-        )}
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-      </div>
 
       {/* Theme Toggle */}
       <div className="mb-6">
@@ -99,11 +116,13 @@ const PatientSettings = () => {
           onChange={(e) => setNewPassword(e.target.value)}
           required
         />
-        <button
-          type="submit"
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      <button
+          onClick={handleResetPassword}
+          disabled={submitted}
+          className={`px-4 py-2 rounded text-white ${
+            submitted ? "bg-gray-500 cursor-not-allowed" : "bg-red-600 hover:bg-pink-500"}`}
         >
-          Reset Password
+          {loading ? "Please wait...": message}
         </button>
       </form>
     </div>

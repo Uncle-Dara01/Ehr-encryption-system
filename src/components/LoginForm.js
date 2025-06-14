@@ -1,58 +1,99 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 const LoginForm = () => {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    setLoading(true);
+    try {
+      const response = await axios.post("http://localhost:4040/admin/login", {
+        email,
+        password,
+      });
 
-    if (email && password) {
-      navigate("/Dashboard");
-    } else {
-      alert("Please enter both email and password.");
+      if (response.data.token) {
+        localStorage.setItem("adminToken", response.data.token);
+        navigate("/admin/dashboard");
+      }
+    } catch (error) {
+      console.error("Login failed:", error.response?.data?.error || error.message);
+      alert(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    navigate(token ? "/admin/dashboard" : "/admin/login");
+  }, [navigate]);
+
   return (
-    
-      <div className="bg-white shadow-xl rounded-lg w-full max-w-sm p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-center text-red-600 mb-6">Admin Login</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FaEnvelope />
+              </span>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="admin@example.com"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
+          <div className="relative">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FaLock />
+              </span>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition"
+            disabled={loading}
+            className={`w-full py-3 px-4 text-white text-lg rounded-md transition font-medium ${
+              loading ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>
-  
+    </div>
   );
 };
-
 
 export default LoginForm;

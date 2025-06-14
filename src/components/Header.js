@@ -11,7 +11,7 @@ const Header = () => {
           className="border px-3 py-1 rounded-md"
         />
         <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
-          U
+          A
         </div>
       </div>
     </header>

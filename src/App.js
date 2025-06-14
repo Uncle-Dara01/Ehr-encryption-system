@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Patients from "./pages/Patients";
 import PatientRegistrationPage from "./pages/PatientRegistrationPage";
 import PatientsListPage from "./pages/PatientsListPage";
+import PatientMedicalHistory from "./components/PatientMedicalRecord";
 import AdminSettings from "./pages/Settings";
 import AdminNotifications from "./pages/Notifications";
 
@@ -28,7 +29,7 @@ function App() {
       <Routes>
         {/* -------------------- PUBLIC ROUTES -------------------- */}
         <Route
-          path="/"
+          path="/admin/login"
           element={
             <PublicLayout>
               <AdminLogin />
@@ -46,15 +47,13 @@ function App() {
 
         {/* -------------------- ADMIN ROUTES -------------------- */}
         <Route
-          path="/Dashboard"
+          path="/admin/dashboard"
           element={
-            <AdminLayout>
               <Dashboard />
-            </AdminLayout>
           }
         />
         <Route
-          path="/Patient"
+          path="/admin/patient"
           element={
             <AdminLayout>
               <Patients />
@@ -62,7 +61,7 @@ function App() {
           }
         />
         <Route
-          path="/PatientRegistration"
+          path="/admin/PatientRegistration"
           element={
             <AdminLayout>
               <PatientRegistrationPage />
@@ -70,7 +69,7 @@ function App() {
           }
         />
         <Route
-          path="/PatientsList"
+          path="/admin/PatientsList"
           element={
             <AdminLayout>
               <PatientsListPage />
@@ -78,7 +77,15 @@ function App() {
           }
         />
         <Route
-          path="/Settings"
+         path="/admin/PatientMedicalHistory"
+         element={
+          <AdminLayout>
+            <PatientMedicalHistory />
+          </AdminLayout>
+         }
+         />
+        <Route
+          path="/admin/settings"
           element={
             <AdminLayout>
               <AdminSettings />
@@ -86,7 +93,7 @@ function App() {
           }
         />
         <Route
-          path="/Notifications"
+          path="/admin/notifications"
           element={
             <AdminLayout>
               <AdminNotifications />
@@ -96,7 +103,7 @@ function App() {
 
         {/* -------------------- PATIENT ROUTES -------------------- */}
         <Route
-          path="/PatientLogin"
+          path="/patient/login"
           element={
             <PublicLayout>
               <PatientLogin />
@@ -104,7 +111,7 @@ function App() {
           }
         />
         <Route
-          path="/PatientProfile"
+          path="/patient/profile"
           element={
             <PatientLayout>
               <PatientProfile />
@@ -112,7 +119,7 @@ function App() {
           }
         />
         <Route
-          path="/PatientNotifications"
+          path="/patient/notifications"
           element={
             <PatientLayout>
               <PatientNotifications />
@@ -120,7 +127,7 @@ function App() {
           }
         />
         <Route
-          path="/MedicalHistory"
+          path="/patient/MedicalHistory"
           element={
             <PatientLayout>
               <MedicalHistory />
@@ -128,7 +135,7 @@ function App() {
           }
         />
         <Route
-          path="/PatientSettings"
+          path="/patient/settings"
           element={
             <PatientLayout>
               <PatientSettings />

@@ -1,48 +1,43 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const PatientRegistration = () => {
-  const [patients, setPatients] = useState(() => {
-    return JSON.parse(localStorage.getItem("patients")) || [];
-  });
+   const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");
+    const [firstname, setFirstName] = useState("");
+    const [lastname, setLastName] = useState("");
+    const [middlename, setOtherName] = useState("");
+    const [gender, setGender] = useState("");
+    const [phone_number, setPhoneNumber] = useState("");
+    const [dob, setDob] = useState("");
+    const [blood_type, setBloodType] = useState("");
+    const [address, setAddress] = useState("");
+    const [next_of_kin_name, setNextOfKinName] = useState("");
+    const [next_of_kin_number, setNextOfKinNumber] = useState("");
+    const [relationship_with_next_of_kin, setRelationship] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    const email = e.target.email.value.trim().toLowerCase();
-    const password = e.target.password.value;
-    const confirm = e.target.confirm.value;
+    setLoading(true);
 
-    // Validate input
-    if (!email || !password || !confirm) {
-      alert("All fields are required.");
-      return;
+    try{
+      const res = await axios.post('http://localhost:4040/admin/add_patient', {
+        email, firstname, lastname, middlename, gender, phone_number, dob, blood_type, address,
+        next_of_kin_name, next_of_kin_number, relationship_with_next_of_kin
+      });
+
+      if(res.data && res.data.message){
+        alert(res.data.message);
+      }
+
+    }catch(error){
+      console.error("Patient Registration failed:", error.response?.data?.error || error.message);
+      alert(error.response?.data?.message || "Patient Registration failed")
+
+    }finally{
+      setLoading(false)
     }
 
-    if (password !== confirm) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    // Check if email already exists
-    const existing = patients.find((p) => p.email === email);
-    if (existing) {
-      alert("A patient with this email already exists.");
-      return;
-    }
-
-    // Create new patient object
-    const newPatient = {
-      id: Date.now(),
-      email,
-      password,
-    };
-
-    // Update patient list and save to localStorage
-    const updatedList = [...patients, newPatient];
-    localStorage.setItem("patients", JSON.stringify(updatedList));
-    setPatients(updatedList);
-
-    e.target.reset();
-    alert("Patient registered successfully.");
   };
 
   return (
@@ -58,6 +53,8 @@ const PatientRegistration = () => {
               <div>
                 <label className="block mb-1 text-sm font-medium">First Name</label>
                 <input
+                  value={firstname}
+                  onChange={(e) => setFirstName(e.target.value)}
                   type="text"
                   placeholder="John"
                   className="w-full border px-4 py-2 rounded-md"
@@ -67,6 +64,8 @@ const PatientRegistration = () => {
               <div>
                 <label className="block mb-1 text-sm font-medium">Last Name</label>
                 <input
+                  value={lastname}
+                  onChange={(e) => setLastName(e.target.value)}
                   type="text"
                   placeholder="Doe"
                   className="w-full border px-4 py-2 rounded-md"
@@ -74,8 +73,23 @@ const PatientRegistration = () => {
                 />
               </div>
               <div>
+                <label className="block mb-1 text-sm font-medium">Other Name</label>
+                <input
+                  value={middlename}
+                  onChange={(e) => setOtherName(e.target.value)}
+                  type="text"
+                  name="middlename"
+                  placeholder=""
+                  className="w-full border px-4 py-2 rounded-md"
+                  required
+                />
+              </div>
+              <div>
                 <label className="block mb-1 text-sm font-medium">Gender</label>
-                <select className="w-full border px-4 py-2 rounded-md">
+                <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                 className="w-full border px-4 py-2 rounded-md">
                   <option>Select</option>
                   <option>Male</option>
                   <option>Female</option>
@@ -83,29 +97,38 @@ const PatientRegistration = () => {
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Date of Birth</label>
-                <input type="date" className="w-full border px-4 py-2 rounded-md" />
+                <input
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  type="date"
+                  className="w-full border px-4 py-2 rounded-md" />
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">Phone Number</label>
                 <input
+                  value={phone_number}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   type="tel"
                   placeholder="(123) 456-7890"
                   className="w-full border px-4 py-2 rounded-md"
                 />
               </div>
+
               <div>
-                <label className="block mb-1 text-sm font-medium">Email</label>
+             <label className="block mb-1 text-sm font-medium">Email</label>
                 <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   type="email"
-                  name="email"
-                  placeholder="email@example.com"
-                  className="w-full border px-4 py-2 rounded-md"
-                  required
-                />
+                  placeholder="example@gmail.com"
+                  className="w-full border px-4 py-2 rounded-md"/>
               </div>
+              
               <div className="md:col-span-2">
                 <label className="block mb-1 text-sm font-medium">Address</label>
                 <input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   type="text"
                   placeholder="123 Main St, City"
                   className="w-full border px-4 py-2 rounded-md"
@@ -121,6 +144,8 @@ const PatientRegistration = () => {
               <div>
                 <label className="block mb-1 text-sm font-medium">Name</label>
                 <input
+                  value={next_of_kin_name}
+                  onChange={(e) => setNextOfKinName(e.target.value)}
                   type="text"
                   placeholder="Jane Doe"
                   className="w-full border px-4 py-2 rounded-md"
@@ -129,6 +154,8 @@ const PatientRegistration = () => {
               <div>
                 <label className="block mb-1 text-sm font-medium">Relationship</label>
                 <input
+                  value={relationship_with_next_of_kin}
+                  onChange={(e) => setRelationship(e.target.value)}
                   type="text"
                   placeholder="Spouse"
                   className="w-full border px-4 py-2 rounded-md"
@@ -137,6 +164,8 @@ const PatientRegistration = () => {
               <div className="md:col-span-2">
                 <label className="block mb-1 text-sm font-medium">Phone Number</label>
                 <input
+                  value={next_of_kin_number}
+                  onChange={(e) => setNextOfKinNumber(e.target.value)}
                   type="tel"
                   placeholder="(123) 456-7899"
                   className="w-full border px-4 py-2 rounded-md"
@@ -151,7 +180,10 @@ const PatientRegistration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-1 text-sm font-medium">Blood Type</label>
-                <select className="w-full border px-4 py-2 rounded-md">
+                <select 
+                value={blood_type}
+                onChange={(e) => setBloodType(e.target.value)}
+                className="w-full border px-4 py-2 rounded-md">
                   <option>Select</option>
                   <option>A+</option>
                   <option>A-</option>
@@ -163,52 +195,18 @@ const PatientRegistration = () => {
                   <option>O-</option>
                 </select>
               </div>
-              <div>
-                <label className="block mb-1 text-sm font-medium">Allergies</label>
-                <input
-                  type="text"
-                  placeholder="Penicillin, Nuts"
-                  className="w-full border px-4 py-2 rounded-md"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block mb-1 text-sm font-medium">Current Medications</label>
-                <textarea
-                  className="w-full border px-4 py-2 rounded-md"
-                  placeholder="List medications..."
-                ></textarea>
-              </div>
-            </div>
-          </section>
-          <section>
-             <h3 className="text-xl font-medium mb-4 text-gray-700">LOGIN CREDENTIALS</h3>
-            <div className="grid grid-cols-1">
-             <label className="block mb-1 text-sm font-medium">Email</label>
-                <input
-                  type="email"
-                  placeholder="example@gmail.com"
-                  className="w-full border px-4 py-2 rounded-md"/>
-<label className="block mb-1 text-sm font-medium">Password</label>
-                <input
-                  type="password"
-                  placeholder="*******"
-                  className="w-full border px-4 py-2 rounded-md"/>
-<label className="block mb-1 text-sm font-medium">Confirm password</label>
-                <input
-                  type="password"
-                  placeholder="*******"
-                  className="w-full border px-4 py-2 rounded-md"/>
-
+            
             </div>
           </section>
 
           {/* Submit */}
           <div className="text-right">
             <button
+            disabled={loading}
               type="submit"
               className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
             >
-              Register Patient
+              {loading ? "Registering patient...": "Register Patient" }
             </button>
           </div>
         </form>

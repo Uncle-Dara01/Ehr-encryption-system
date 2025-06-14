@@ -1,58 +1,94 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 const PatientLogin = () => {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    setLoading(true);
+    try {
+      const response = await axios.post("http://localhost:4040/patient/login", {
+        email,
+        password,
+      });
 
-    const storedPatients = JSON.parse(localStorage.getItem("patients")) || [];
-    const match = storedPatients.find(
-      (p) => p.email === email && p.password === password
-    );
-
-    if (match) {
-      localStorage.setItem("patientLoggedIn", JSON.stringify(match));
-      navigate("/PatientProfile");
-    } else {
-      alert("Invalid email or password.");
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/patient/MedicalHistory");
+      }
+    } catch (error) {
+      console.error("Login failed:", error.response?.data?.error || error.message);
+      alert(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-white-600 to-red-600 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-red-700 mb-6">Patient Login</h2>
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    navigate(token ? "/patient/MedicalHistory" : "/patient/login");
+  }, [navigate]);
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-              required
-            />
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
+        <h2 className="text-3xl font-bold text-center text-red-600 mb-6">Patient Login</h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FaEnvelope />
+              </span>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="admin@example.com"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block mb-1 font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+          <div className="relative">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <FaLock />
+              </span>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded hover:bg-pink-700 transition"
+            disabled={loading}
+            className={`w-full py-3 px-4 text-white text-lg rounded-md transition font-medium ${
+              loading ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

@@ -1,46 +1,50 @@
-import React from "react";
-
-const dummyData = [
-  {
-    id: 1,
-    patient: "John Doe",
-    method: "Email",
-    date: "2025-05-19",
-    time: "10:32 AM",
-  },
-  {
-    id: 2,
-    patient: "Jane Smith",
-    method: "Portal",
-    date: "2025-05-18",
-    time: "4:20 PM",
-  },
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Notifications = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        const res = await axios.get("http://localhost:4040/admin/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setNotifications(res.data.notifications || []);
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+        setNotifications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Notifications</h2>
-      <table className="w-full border">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2">Patient</th>
-            <th className="p-2">Sent Via</th>
-            <th className="p-2">Date</th>
-            <th className="p-2">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyData.map((n) => (
-            <tr key={n.id} className="border-t">
-              <td className="p-2">{n.patient}</td>
-              <td className="p-2">{n.method}</td>
-              <td className="p-2">{n.date}</td>
-              <td className="p-2">{n.time}</td>
-            </tr>
+
+      {loading ? (
+        <p className="text-gray-500">Loading notifications...</p>
+      ) : notifications.length === 0 ? (
+        <p className="text-gray-500">You have no notifications yet.</p>
+      ) : (
+        <ul className="space-y-4">
+          {notifications.map((note) => (
+            <li key={note.id} className="p-4 bg-white dark:bg-gray-800 border rounded shadow">
+              <p className="text-gray-800 dark:text-gray-100">{note.message}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {note.date} at {note.time}
+              </p>
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      )}
     </div>
   );
 };
