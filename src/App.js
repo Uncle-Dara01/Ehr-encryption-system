@@ -22,6 +22,7 @@ import PatientProfile from "./pages/PatientProfile";
 import PatientSettings from "./pages/PatientSettings";
 import PatientNotifications from "./pages/PatientNotifications";
 import MedicalHistory from "./pages/MedicalHistory";
+import PatientDashboard from "./components/PatientDashboard";
 
 function App() {
   return (
@@ -49,11 +50,13 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
+            <AdminLayout>
               <Dashboard />
+              </AdminLayout>
           }
         />
         <Route
-          path="/admin/patient"
+          path="/admin/patients"
           element={
             <AdminLayout>
               <Patients />
@@ -61,7 +64,7 @@ function App() {
           }
         />
         <Route
-          path="/admin/PatientRegistration"
+          path="/admin/patients/registration"
           element={
             <AdminLayout>
               <PatientRegistrationPage />
@@ -69,7 +72,7 @@ function App() {
           }
         />
         <Route
-          path="/admin/PatientsList"
+          path="/admin/patients/list"
           element={
             <AdminLayout>
               <PatientsListPage />
@@ -77,7 +80,7 @@ function App() {
           }
         />
         <Route
-         path="/admin/PatientMedicalHistory"
+         path="/admin/patients/medicalhistory"
          element={
           <AdminLayout>
             <PatientMedicalHistory />
@@ -110,6 +113,14 @@ function App() {
             </PublicLayout>
           }
         />
+
+           <Route
+          path="/patient/dashboard"
+          element={
+           <PatientDashboard />
+          }
+        />
+
         <Route
           path="/patient/profile"
           element={

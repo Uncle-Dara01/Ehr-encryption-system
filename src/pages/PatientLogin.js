@@ -20,7 +20,7 @@ const PatientLogin = () => {
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/patient/MedicalHistory");
+        navigate("/patient/dashboard");
       }
     } catch (error) {
       console.error("Login failed:", error.response?.data?.error || error.message);
@@ -32,7 +32,7 @@ const PatientLogin = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    navigate(token ? "/patient/MedicalHistory" : "/patient/login");
+    navigate(token ? "/patient/dashboard" : "/patient/login");
   }, [navigate]);
 
   return (

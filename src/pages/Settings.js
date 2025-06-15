@@ -1,5 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { ThemeContext } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Settings = () => {
@@ -8,6 +9,29 @@ const Settings = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const navigate = useNavigate();
+    
+      
+      useEffect(()=>{
+        const checkedAuth = async()=>{
+          try{
+            const token = localStorage.getItem("adminToken");
+    
+            if(!token){
+              return navigate("/admin/login");
+            }else{
+              setChecked(true);
+            }
+           } catch(error){
+            console.error(error);
+            navigate("/admin/login");
+          }
+        };
+    
+        checkedAuth();
+      }, [navigate]);
+
 
   const handleResetPassword = async(e) => {
     e.preventDefault();
@@ -31,7 +55,8 @@ const Settings = () => {
     }
     
   };
-
+  
+  if(!checked) return <p className="text-center mt-5">Checking Authentication..</p>
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Settings</h2>

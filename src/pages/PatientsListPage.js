@@ -1,8 +1,32 @@
 import React, {useState, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PatientsListPage = () => {
   const [patients, setPatients] = useState([]);
+  const [checked, setChecked] = useState(false);
+      const navigate = useNavigate();
+    
+      
+      useEffect(()=>{
+        const checkedAuth = async()=>{
+          try{
+            const token = localStorage.getItem("adminToken");
+    
+            if(!token){
+              return navigate("/admin/login");
+            }else{
+              setChecked(true);
+            }
+           } catch(error){
+            console.error(error);
+            navigate("/admin/login");
+          }
+        };
+    
+        checkedAuth();
+      }, [navigate]);
+  
 
   useEffect(()=>{
     const fetchPatientsData = async () =>{
@@ -22,13 +46,15 @@ const PatientsListPage = () => {
     fetchPatientsData();
   },[]);
 
+    if(!checked) return <p className="text-center mt-5">Checking Authentication..</p>
+
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Patients List</h2>
       <ul className="space-y-2">
-        {patients.map((p) => (
+        {patients.map((p, index) => (
           <li key={p.patient_id} className="p-4 bg-white rounded shadow">
-            {`${p.lastname} ${p.firstname} ${p.middlename}`}
+           <b>{index + 1}.</b> {`${p.lastname} ${p.firstname} ${p.middlename}`}
           </li>
         ))}
       </ul>

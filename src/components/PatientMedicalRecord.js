@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PatientMedicalHistory = () => {
@@ -6,6 +7,30 @@ const PatientMedicalHistory = () => {
   const [records, setRecords] = useState([{ title: "", medical_history_text: "" }]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [checked, setChecked] = useState(false);
+  const navigate = useNavigate();
+    
+      
+      useEffect(()=>{
+        const checkedAuth = async()=>{
+          try{
+            const token = localStorage.getItem("adminToken");
+    
+            if(!token){
+              return navigate("/admin/login");
+            }else{
+              setChecked(true);
+            }
+           } catch(error){
+            console.error(error);
+            navigate("/admin/login");
+          }
+        };
+    
+        checkedAuth();
+      }, [navigate]);
+  
+  if(!checked) return <p className="text-center mt-5">Checking Authentication..</p>
 
   const handleRecordChange = (index, field, value) => {
     const updated = [...records];

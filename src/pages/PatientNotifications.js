@@ -1,9 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import NotificationItem from "../components/NotificationItem";
+import { useNavigate } from "react-router-dom";
 
-const PatientNotifications = () => {
+  const PatientNotifications = () => {
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [checked, setChecked] = useState(false);
+  const navigate = useNavigate();
+    
+      
+      useEffect(()=>{
+        const checkedAuth = async()=>{
+          try{
+            const token = localStorage.getItem("token");
+    
+            if(!token){
+              return navigate("/patient/login");
+            }else{
+              setChecked(true);
+            }
+           } catch(error){
+            console.error(error);
+            navigate("/patient/login");
+          }
+        };
+    
+        checkedAuth();
+      }, [navigate]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -12,39 +35,35 @@ const PatientNotifications = () => {
         const res = await axios.get("http://localhost:4040/patient/notifications", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setNotifications(res.data.notifications || []);
       } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-        setNotifications([]);
-      } finally {
-        setLoading(false);
+        console.error("Fetch failed:", err);
       }
     };
 
     fetchNotifications();
   }, []);
 
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Notifications</h2>
+  const handleMarkedAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    );
+  };
+  
+    if(!checked) return <p className="text-center mt-5">Checking Authentication..</p>
 
-      {loading ? (
-        <p className="text-gray-500">Loading notifications...</p>
-      ) : notifications.length === 0 ? (
-        <p className="text-gray-500">You have no notifications yet.</p>
-      ) : (
-        <ul className="space-y-4">
-          {notifications.map((note) => (
-            <li key={note.id} className="p-4 bg-white dark:bg-gray-800 border rounded shadow">
-              <p className="text-gray-800 dark:text-gray-100">{note.message}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {note.date} at {note.time}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
+  return (
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Notifications</h2>
+      <ul className="space-y-4">
+        {notifications.map((note) => (
+          <NotificationItem
+            key={note.id}
+            note={note}
+            onMarkedAsRead={handleMarkedAsRead}
+          />
+        ))}
+      </ul>
     </div>
   );
 };

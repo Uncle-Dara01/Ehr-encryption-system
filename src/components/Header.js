@@ -3,7 +3,7 @@ import React from "react";
 const Header = () => {
   return (
     <header className="flex justify-between items-center py-4 px-6 bg-white shadow-md">
-      <h2 className="text-xl font-semibold">Dashboard</h2>
+      <h2 className="text-xl font-semibold">Administrator Dashboard</h2>
       <div className="flex items-center space-x-4">
         <input
           type="text"
