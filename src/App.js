@@ -11,7 +11,7 @@ import AdminLogin from "./pages/Logiin"; // admin login
 import Dashboard from "./pages/Dashboard";
 import Patients from "./pages/Patients";
 import PatientRegistrationPage from "./pages/PatientRegistrationPage";
-import PatientsListPage from "./pages/PatientsListPage";
+import AdminManagePatients from "./pages/PatientsListPage";
 import PatientMedicalHistory from "./components/PatientMedicalRecord";
 import AdminSettings from "./pages/Settings";
 import AdminNotifications from "./pages/Notifications";
@@ -75,7 +75,7 @@ function App() {
           path="/admin/patients/list"
           element={
             <AdminLayout>
-              <PatientsListPage />
+              <AdminManagePatients />
             </AdminLayout>
           }
         />

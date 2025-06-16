@@ -30,7 +30,7 @@ const Sidebar = () => {
     navigate("/admin/login");
   };
 
-  if (!checked) return <p className="text-center mt-5">Checking authentication...</p>;
+  if (!checked) return <p className="text-center mt-5"></p>;
 
   const linkClass = ({ isActive }) =>
     `flex items-center gap-2 px-3 py-2 rounded hover:bg-red-600 ${
